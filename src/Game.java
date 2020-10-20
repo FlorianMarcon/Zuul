@@ -23,6 +23,8 @@ public class Game {
     private ItemFactory itemFactory;
     private final int MAX_WEIGHT = 10;
 
+    private boolean finished = false;
+
     /**
      * Create the game and initialise its internal map.
      */
@@ -74,10 +76,9 @@ public class Game {
         // Enter the main command loop.  Here we repeatedly read commands and
         // execute them until the game is over.
 
-        boolean finished = false;
-        while (!finished) {
+        while (!this.finished) {
             Command command = parser.getCommand();
-            finished = processCommand(command);
+            processCommand(command);
         }
         System.out.println("Thank you for playing.  Good bye.");
     }
@@ -98,46 +99,31 @@ public class Game {
      * Given a command, process (that is: execute) the command.
      *
      * @param command The command to be processed.
-     * @return true If the command ends the game, false otherwise.
      */
-    private boolean processCommand(Command command) {
-        boolean wantToQuit = false;
+    private void processCommand(Command command) {
+        AGameCommand execution = CommandFactory.getCommand(command);
 
-        if (command.isUnknown()) {
+        if (execution == null)
             System.out.println("I don't know what you mean...");
-            return false;
-        }
+        else
+            execution.execute();
 
-        String commandWord = command.getCommandWord();
-        if (commandWord.equals("help")) {
-            printHelp();
-        } else if (commandWord.equals("go")) {
-            goRoom(command);
-        } else if (commandWord.equals("quit")) {
-            wantToQuit = quit(command);
-        } else if (commandWord.equals("look")) {
-            look();
-        } else if (commandWord.equals("take")) {
-            take(command);
-        } else if (commandWord.equals("drop")) {
-            drop(command);
-        } else if (commandWord.equals("give")) {
-            give(command);
-        }
-        return wantToQuit;
-    }
-
-// implementations of user commands:
-    /**
-     * Print out some help information. Here we print some stupid, cryptic
-     * message and a list of the command words.
-     */
-    private void printHelp() {
-        System.out.println("You are lost. You are alone. You wander");
-        System.out.println("around at the university.");
-        System.out.println();
-        System.out.println("Your command words are:");
-        System.out.println("   go quit help look take drop give");
+        // String commandWord = command.getCommandWord();
+        // if (commandWord.equals("help")) {
+        //     printHelp();
+        // } else if (commandWord.equals("go")) {
+        //     goRoom(command);
+        // } else if (commandWord.equals("quit")) {
+        //     quit(command);
+        // } else if (commandWord.equals("look")) {
+        //     look();
+        // } else if (commandWord.equals("take")) {
+        //     take(command);
+        // } else if (commandWord.equals("drop")) {
+        //     drop(command);
+        // } else if (commandWord.equals("give")) {
+        //     give(command);
+        // }
     }
 
     /**
@@ -167,7 +153,7 @@ public class Game {
     /**
      * "Look" was entered. Report what the player can see in the room
      */
-    private void look() {
+    public void look() {
         System.out.println("You are " + currentRoom.getDescription());
         System.out.print("Exits: ");
         currentRoom.getExits().forEach((destination, room) -> System.out.print(destination + " "));
@@ -177,96 +163,22 @@ public class Game {
     }
 
     /**
-     * Try to take an item from the current room, otherwise print an error
-     * message.
+     * Set finished variable
+     * @param finished
      */
-    private void take(Command command) {
-        if (!command.hasSecondWord()) {
-            // if there is no second word, we don't know what to take...
-            System.out.println("Take what?");
-            return;
-        }
-
-        String itemName = command.getSecondWord();
-        Item item = currentRoom.getItem(itemName);
-        if (item == null) {
-            // The item is not in the room
-            System.out.println("No " + itemName + " in the room");
-            return;
-        }
-        // OK we can pick it up
-        currentRoom.removeItem(itemName);
-        try {
-            itemFactory.addItem(item);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return;
-        }
+    public void setFinish(boolean finished) {
+        this.finished = finished;
     }
 
-    /**
-     * Try to drop an item, otherwise print an error message.
-     */
-    private void drop(Command command) {
-        if (!command.hasSecondWord()) {
-            // if there is no second word, we don't know what to drop...
-            System.out.println("Drop what?");
-            return;
-        }
-
-        String itemName = command.getSecondWord();
-        Item item = this.itemFactory.getItem(itemName);
-        if (item == null) {
-            System.out.println("Drop what?");
-        } else {
-            this.itemFactory.removeItem(itemName);
-            currentRoom.addItem(item);
-        }
+    public ItemFactory getItemFactory() {
+        return this.itemFactory;
     }
 
-    /**
-     * Try to drop an item, otherwise print an error message.
-     */
-    private void give(Command command) {
-        if (!command.hasSecondWord()) {
-            // if there is no second word, we don't know what to give...
-            System.out.println("Give what?");
-            return;
-        }
-        if (!command.hasThirdWord()) {
-            // if there is no third word, we don't to whom to give it...
-            System.out.println("Give it to who?");
-            return;
-        }
-
-        String itemName = command.getSecondWord();
-        String whom = command.getThirdWord();
-
-        if (!currentRoom.getCharacter().equals(whom)) {
-            // cannot give it if the chacter is not here
-            System.out.println(whom + " is not in the room");
-            return;
-        }
-        Item item = this.itemFactory.getItem(itemName);
-        if (item == null) {
-            System.out.println("You don't have the " + itemName);
-            return;
-        }
-        this.itemFactory.removeItem(itemName);
+    public Room getCurrentRoom() {
+        return this.currentRoom;
     }
 
-    /**
-     * "Quit" was entered. Check the rest of the command to see whether we
-     * really quit the game.
-     *
-     * @return true, if this command quits the game, false otherwise.
-     */
-    private boolean quit(Command command) {
-        if (command.hasSecondWord()) {
-            System.out.println("Quit what?");
-            return false;
-        } else {
-            return true;  // signal that we want to quit
-        }
+    public void setCurrentRoom(Room room) {
+        this.currentRoom = room;
     }
 }
