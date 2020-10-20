@@ -14,16 +14,16 @@
  */
 public class Room extends ItemFactory
 {
-    public String description;
+    private String description;
     
     // Exits from the room
-    public Room northExit;
-    public Room southExit;
-    public Room eastExit;
-    public Room westExit;
+    private Room northExit;
+    private Room southExit;
+    private Room eastExit;
+    private Room westExit;
     
     // Characters in the room
-    public String character;
+    private String character;
 
     /**
      * Create a room described "description". Initially, it has
@@ -62,5 +62,40 @@ public class Room extends ItemFactory
     public String getDescription()
     {
         return description;
+    }
+
+    /**
+     * @return Get room located at north
+     */
+    public Room getNorthExit() {
+        return this.northExit;
+    }
+
+    /**
+     * @return Get room located at south
+     */
+    public Room getSouthExit() {
+        return this.southExit;
+    }
+
+    /**
+     * @return Get room located at east
+     */
+    public Room getEastExit() {
+        return this.eastExit;
+    }
+
+    /**
+     * @return Get room located at wet
+     */
+    public Room getWestExit() {
+        return this.westExit;
+    }
+
+    /**
+     * @return character
+     */
+    public String getCharacter() {
+        return this.character;
     }
 }

@@ -1,6 +1,3 @@
-
-import java.util.ArrayList;
-
 /**
  * This class is the main class of the "World of Zuul" application. "World of
  * Zuul" is a very simple, text based adventure game. Users can walk around some
@@ -156,16 +153,16 @@ public class Game {
         // Try to leave current room.
         Room nextRoom = null;
         if (direction.equals("north")) {
-            nextRoom = currentRoom.northExit;
+            nextRoom = currentRoom.getNorthExit();
         }
         if (direction.equals("east")) {
-            nextRoom = currentRoom.eastExit;
+            nextRoom = currentRoom.getEastExit();
         }
         if (direction.equals("south")) {
-            nextRoom = currentRoom.southExit;
+            nextRoom = currentRoom.getSouthExit();
         }
         if (direction.equals("west")) {
-            nextRoom = currentRoom.westExit;
+            nextRoom = currentRoom.getWestExit();
         }
 
         if (nextRoom == null) {
@@ -182,16 +179,16 @@ public class Game {
     private void look() {
         System.out.println("You are " + currentRoom.getDescription());
         System.out.print("Exits: ");
-        if (currentRoom.northExit != null) {
+        if (currentRoom.getNorthExit() != null) {
             System.out.print("north ");
         }
-        if (currentRoom.eastExit != null) {
+        if (currentRoom.getEastExit() != null) {
             System.out.print("east ");
         }
-        if (currentRoom.southExit != null) {
+        if (currentRoom.getSouthExit() != null) {
             System.out.print("south ");
         }
-        if (currentRoom.westExit != null) {
+        if (currentRoom.getWestExit() != null) {
             System.out.print("west ");
         }
         System.out.println();
@@ -265,7 +262,7 @@ public class Game {
         String itemName = command.getSecondWord();
         String whom = command.getThirdWord();
 
-        if (!currentRoom.character.equals(whom)) {
+        if (!currentRoom.getCharacter().equals(whom)) {
             // cannot give it if the chacter is not here
             System.out.println(whom + " is not in the room");
             return;
