@@ -1,3 +1,5 @@
+import java.util.HashMap;
+
 /**
  * Class Room - a room in an adventure game.
  *
@@ -16,11 +18,7 @@ public class Room extends ItemFactory
 {
     private String description;
     
-    // Exits from the room
-    private Room northExit;
-    private Room southExit;
-    private Room eastExit;
-    private Room westExit;
+    private HashMap<String, Room> exits = new HashMap<>();
     
     // Characters in the room
     private String character;
@@ -37,23 +35,39 @@ public class Room extends ItemFactory
     }
 
     /**
-     * Define the exits of this room.  Every direction either leads
-     * to another room or is null (no exit there).
-     * @param north The north exit.
-     * @param east The east east.
-     * @param south The south exit.
-     * @param west The west exit.
+     * Set an exit
+     * @param direction string representing the direction to the new room  
+     * @param room Room
      */
-    public void setExits(Room north, Room east, Room south, Room west) 
-    {
-        if(north != null)
-            northExit = north;
-        if(east != null)
-            eastExit = east;
-        if(south != null)
-            southExit = south;
-        if(west != null)
-            westExit = west;
+    public void addExit(String direction, Room room) {
+        this.exits.put(direction, room);
+    }
+
+    /**
+     * Get room corresponding the exit  
+     * @param direction Direction to look for
+     * @return Room or null
+     */
+    public Room getExit(String direction) {
+        return this.exits.get(direction);
+    }
+
+    /**
+     * Get all exits
+     * 
+     * @return Hasmap of direction and exits
+     */
+    public HashMap<String, Room>    getExits() {
+        return this.exits;
+    }
+
+    /**
+     * Check if an exit exists
+     * @param direction Direction to check
+     * @return True if exist, False otherwise
+     */
+    public Boolean isExistingExit(String direction) {
+        return (this.exits.get(direction) != null);
     }
 
     /**
@@ -62,34 +76,6 @@ public class Room extends ItemFactory
     public String getDescription()
     {
         return description;
-    }
-
-    /**
-     * @return Get room located at north
-     */
-    public Room getNorthExit() {
-        return this.northExit;
-    }
-
-    /**
-     * @return Get room located at south
-     */
-    public Room getSouthExit() {
-        return this.southExit;
-    }
-
-    /**
-     * @return Get room located at east
-     */
-    public Room getEastExit() {
-        return this.eastExit;
-    }
-
-    /**
-     * @return Get room located at wet
-     */
-    public Room getWestExit() {
-        return this.westExit;
     }
 
     /**

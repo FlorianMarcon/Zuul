@@ -52,12 +52,15 @@ public class Game {
         office = new Room("in the computing admin office");
 
         // initialise room exits
-        outside.setExits(null, theatre, lab, pub);
+        outside.addExit(ECardinality.EAST.toString(), theatre);
+        outside.addExit(ECardinality.SOUTH.toString(), lab);
+        outside.addExit(ECardinality.WEST.toString(), pub);
         outside.addItem(new Item("notebook", 2));
-        theatre.setExits(null, null, null, outside);
-        pub.setExits(null, outside, null, null);
-        lab.setExits(outside, office, null, null);
-        office.setExits(null, null, null, lab);
+        theatre.addExit(ECardinality.WEST.toString(), outside);
+        pub.addExit(ECardinality.EAST.toString(), outside);
+        lab.addExit(ECardinality.NORTH.toString(), outside);
+        lab.addExit(ECardinality.EAST.toString(), office);
+        office.addExit(ECardinality.WEST.toString(), lab);
 
         currentRoom = outside;  // start game outside
     }
@@ -152,19 +155,7 @@ public class Game {
 
         // Try to leave current room.
         Room nextRoom = null;
-        if (direction.equals("north")) {
-            nextRoom = currentRoom.getNorthExit();
-        }
-        if (direction.equals("east")) {
-            nextRoom = currentRoom.getEastExit();
-        }
-        if (direction.equals("south")) {
-            nextRoom = currentRoom.getSouthExit();
-        }
-        if (direction.equals("west")) {
-            nextRoom = currentRoom.getWestExit();
-        }
-
+        nextRoom = currentRoom.getExit(direction);
         if (nextRoom == null) {
             System.out.println("There is no door!");
         } else {
@@ -179,18 +170,7 @@ public class Game {
     private void look() {
         System.out.println("You are " + currentRoom.getDescription());
         System.out.print("Exits: ");
-        if (currentRoom.getNorthExit() != null) {
-            System.out.print("north ");
-        }
-        if (currentRoom.getEastExit() != null) {
-            System.out.print("east ");
-        }
-        if (currentRoom.getSouthExit() != null) {
-            System.out.print("south ");
-        }
-        if (currentRoom.getWestExit() != null) {
-            System.out.print("west ");
-        }
+        currentRoom.getExits().forEach((destination, room) -> System.out.print(destination + " "));
         System.out.println();
         System.out.println("Items: ");
         currentRoom.getItems().forEach(item -> System.out.println(" - " + item.getName() + '(' + item.getWeight() + ')'));
