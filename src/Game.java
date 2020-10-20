@@ -19,6 +19,8 @@ import java.util.ArrayList;
  */
 public class Game {
 
+    private static Game instance = null;
+
     private Parser parser;
     private Room currentRoom;
     private ArrayList items;
@@ -29,12 +31,18 @@ public class Game {
     /**
      * Create the game and initialise its internal map.
      */
-    public Game() {
+    private Game() {
         createRooms();
         parser = new Parser();
         items = new ArrayList();
         weights = new ArrayList();
         totalWeight = 0;
+    }
+
+    public static Game getInstance() {
+        if (Game.instance == null)
+            Game.instance = new Game();
+        return Game.instance;
     }
 
     /**
