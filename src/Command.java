@@ -35,7 +35,7 @@ public class Command
     {
         commandWord = firstWord;
         this.secondWord = secondWord;
-        this.thirdWord = secondWord;
+        this.thirdWord = thirdWord;
 
     }
 
@@ -64,7 +64,7 @@ public class Command
      */
     public String getThirdWord()
     {
-        return secondWord;
+        return thirdWord;
     }
     
     /**
