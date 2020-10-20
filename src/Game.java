@@ -23,9 +23,7 @@ public class Game {
 
     private Parser parser;
     private Room currentRoom;
-    private ArrayList items;
-    private ArrayList weights;
-    private int totalWeight;
+    private ItemFactory itemFactory;
     private final int MAX_WEIGHT = 10;
 
     /**
@@ -34,9 +32,7 @@ public class Game {
     private Game() {
         createRooms();
         parser = new Parser();
-        items = new ArrayList();
-        weights = new ArrayList();
-        totalWeight = 0;
+        itemFactory = new ItemFactory(MAX_WEIGHT);
     }
 
     public static Game getInstance() {
@@ -60,7 +56,7 @@ public class Game {
 
         // initialise room exits
         outside.setExits(null, theatre, lab, pub);
-        outside.addItem("notebook", 2);
+        outside.addItem(new Item("notebook", 2));
         theatre.setExits(null, null, null, outside);
         pub.setExits(null, outside, null, null);
         lab.setExits(outside, office, null, null);
@@ -141,7 +137,7 @@ public class Game {
         System.out.println("around at the university.");
         System.out.println();
         System.out.println("Your command words are:");
-        System.out.println("   go quit help");
+        System.out.println("   go quit help look take drop give");
     }
 
     /**
@@ -199,12 +195,8 @@ public class Game {
             System.out.print("west ");
         }
         System.out.println();
-        System.out.print("Items: ");
-        if (currentRoom.itemDescription != null) {
-            System.out.print(currentRoom.itemDescription
-                    + '(' + currentRoom.itemWeight + ')');
-        }
-        System.out.println();
+        System.out.println("Items: ");
+        currentRoom.getItems().forEach(item -> System.out.println(" - " + item.getName() + '(' + item.getWeight() + ')'));
     }
 
     /**
@@ -218,23 +210,21 @@ public class Game {
             return;
         }
 
-        String item = command.getSecondWord();
-        int w = currentRoom.containsItem(item);
-        if (w == 0) {
+        String itemName = command.getSecondWord();
+        Item item = currentRoom.getItem(itemName);
+        if (item == null) {
             // The item is not in the room
-            System.out.println("No " + item + " in the room");
-            return;
-        }
-        if (totalWeight + w <= MAX_WEIGHT) {
-            // The player is carrying too much
-            System.out.println(item + " is too heavy");
+            System.out.println("No " + itemName + " in the room");
             return;
         }
         // OK we can pick it up
-        currentRoom.removeItem(item);
-        items.add(item);
-        weights.add(w);
-        totalWeight += w;
+        currentRoom.removeItem(itemName);
+        try {
+            itemFactory.addItem(item);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return;
+        }
     }
 
     /**
@@ -247,16 +237,14 @@ public class Game {
             return;
         }
 
-        String item = command.getSecondWord();
-        int i = items.indexOf(item);
-        if (i == -1) {
-            System.out.println("You don't have the " + item);
-            return;
+        String itemName = command.getSecondWord();
+        Item item = this.itemFactory.getItem(itemName);
+        if (item == null) {
+            System.out.println("Drop what?");
+        } else {
+            this.itemFactory.removeItem(itemName);
+            currentRoom.addItem(item);
         }
-        items.remove(i);
-        int w = (Integer) weights.remove(i);
-        currentRoom.addItem(item, w);
-        totalWeight -= w;
     }
 
     /**
@@ -274,7 +262,7 @@ public class Game {
             return;
         }
 
-        String item = command.getSecondWord();
+        String itemName = command.getSecondWord();
         String whom = command.getThirdWord();
 
         if (!currentRoom.character.equals(whom)) {
@@ -282,14 +270,12 @@ public class Game {
             System.out.println(whom + " is not in the room");
             return;
         }
-        int i = items.indexOf(item);
-        if (i == -1) {
-            System.out.println("You don't have the " + item);
+        Item item = this.itemFactory.getItem(itemName);
+        if (item == null) {
+            System.out.println("You don't have the " + itemName);
             return;
         }
-        items.remove(i);
-        int w = (Integer) weights.remove(i);
-        totalWeight -= w;
+        this.itemFactory.removeItem(itemName);
     }
 
     /**

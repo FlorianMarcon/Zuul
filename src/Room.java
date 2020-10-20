@@ -12,7 +12,7 @@
  * @author  Michael Kolling and David J. Barnes
  * @version 2006.03.30
  */
-public class Room 
+public class Room extends ItemFactory
 {
     public String description;
     
@@ -21,10 +21,6 @@ public class Room
     public Room southExit;
     public Room eastExit;
     public Room westExit;
-    
-    // An item in the room
-    public String itemDescription;
-    public int itemWeight;
     
     // Characters in the room
     public String character;
@@ -67,41 +63,4 @@ public class Room
     {
         return description;
     }
-    
-    /**
-     * Add an item to the Room
-     * @param description The description of the item
-     * @param weight The item's weight
-     */
-    public void addItem(String description, int weight) {
-        itemDescription = description;
-        itemWeight = weight;               
-    }
-    
-    /**
-     * Does the room contain an item
-     * @param description the item
-     * @ return the item's weight or 0 if none
-     */
-    public int containsItem(String description) {
-        if (itemDescription.equals(description)) 
-            return itemWeight;
-        else return 0;
-    }
-    
-    /**
-     * Remove an item from the Room
-     */
-    public String removeItem(String description) {
-        if (itemDescription.equals(description)) {
-            String tmp = itemDescription;
-            itemDescription = null;
-            return tmp;
-        }
-        else {
-            System.out.println("This room does not contain" + description);
-            return null;
-        }
-    }
-    
 }
